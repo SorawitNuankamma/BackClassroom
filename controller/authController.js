@@ -204,3 +204,10 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // log the user in and send JWT
   createSendToken(user, 200, res);
 });
+
+exports.isLogin = catchAsync(async (req, res, next) => {
+  // SEND RESPONSE
+  res.status(200).json({
+    status: 'success',
+  });
+});

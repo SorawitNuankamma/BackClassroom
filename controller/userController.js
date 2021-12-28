@@ -2,17 +2,7 @@ const User = require('../models/userModel');
 const APIFeatures = require('../utils/apifeatures');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-
-// Utility
-const filterObject = (obj, ...allowedFields) => {
-  const newObj = {};
-  Object.keys(obj).forEach((el) => {
-    if (allowedFields.includes(el)) {
-      newObj[el] = obj[el];
-    }
-  });
-  return newObj;
-};
+const utility = require('../utils/utility');
 
 // Adminstator API
 //ROUTE HANDLER
@@ -129,7 +119,7 @@ exports.updateMyUser = catchAsync(async (req, res, next) => {
   }
 
   //filter | argument ตามด้วยค่าใน DB ที่ user สามารถเปลี่ยนเองได้
-  const filterdBody = filterObject(req.body, 'name');
+  const filterdBody = utility.filterObject(req.body, 'name');
   const updateUser = await User.findByIdAndUpdate(req.user.id, filterdBody, {
     new: true,
     runValidators: true,
@@ -141,6 +131,21 @@ exports.updateMyUser = catchAsync(async (req, res, next) => {
     status: 'success',
     data: {
       user: updateUser,
+    },
+  });
+});
+
+// User route
+
+exports.getMyUser = catchAsync(async (req, res, next) => {
+  const user = req.user;
+  if (!user) {
+    return next(new AppError('unknown error', 404));
+  }
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
     },
   });
 });

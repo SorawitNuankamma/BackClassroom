@@ -11,11 +11,16 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const compression = require('compression');
+const cors = require('cors');
 
 //ROUTER
 const userRouter = require('./routes/userRoutes');
+const classroomRouter = require('./routes/classroomRoutes');
 
 const app = express();
+
+//Allow ALL CORS
+app.use(cors());
 
 // GLOBAL MIDDLEWARE
 // Set security HTTP Header
@@ -29,7 +34,7 @@ if (process.env.NODE_ENV === 'development') {
 // Request limiter
 // จำกัด 100 request ต่อ ip ในช่วง 1 ชั่วโมงเวลา
 const limiter = rateLimit({
-  max: 100,
+  max: 1000,
   windowMs: 60 * 60 * 1000,
   message: 'Too many request, please try again in an hour',
 });
@@ -63,6 +68,7 @@ app.use(compression());
 // ROUTE
 // route mouting
 app.use('/api/users', userRouter);
+app.use('/api/classrooms', classroomRouter);
 
 // Unhandled route
 app.all('*', (req, res, next) => {
