@@ -33,7 +33,7 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
     passwordChangedAt: Date,
-    classroom: {
+    classrooms: {
       type: Array,
       default: [],
     },

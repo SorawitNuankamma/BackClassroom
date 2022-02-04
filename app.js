@@ -16,6 +16,11 @@ const cors = require('cors');
 //ROUTER
 const userRouter = require('./routes/userRoutes');
 const classroomRouter = require('./routes/classroomRoutes');
+const contentRouter = require('./routes/contentRoutes');
+const lineUserRouter = require('./routes/lineUserRoutes');
+const fileRouter = require('./routes/fileRoutes');
+const submissionRouter = require('./routes/submissionRoutes');
+const lineAPIRouter = require('./routes/lineAPIRoutes');
 
 const app = express();
 
@@ -69,6 +74,11 @@ app.use(compression());
 // route mouting
 app.use('/api/users', userRouter);
 app.use('/api/classrooms', classroomRouter);
+app.use('/api/contents', contentRouter);
+app.use('/api/lineUsers', lineUserRouter);
+app.use('/api/files', fileRouter);
+app.use('/api/submissions', submissionRouter);
+app.use('/api/lineAPI', lineAPIRouter);
 
 // Unhandled route
 app.all('*', (req, res, next) => {

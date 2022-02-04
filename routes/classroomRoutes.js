@@ -8,14 +8,26 @@ const router = express.Router();
 // Normal route
 router.get(
   '/getMyClassroom',
-  authController.protect,
+  authController.loginOnly,
   classroomController.getMyClassroom
+);
+
+router.get('/getMemberInfo', classroomController.getMemberInfo);
+router.get(
+  '/getAllMembersAndSubmissions',
+  classroomController.getAllMembersAndSubmissions
 );
 
 router.patch(
   '/updateMyClassroom',
-  authController.protect,
+  authController.loginOnly,
   classroomController.updateMyClassroom
+);
+
+router.post(
+  '/joinClassroom',
+  authController.loginOnly,
+  classroomController.joinClassroom
 );
 
 // Aggreatte route
@@ -26,7 +38,7 @@ router
   .route('/')
   .get(classroomController.getAllClassrooms)
   .post(
-    authController.protect,
+    authController.loginOnly,
     classroomController.formatPostRequest,
     classroomController.postClassroom
   );
