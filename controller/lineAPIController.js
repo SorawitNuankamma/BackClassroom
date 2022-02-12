@@ -4,7 +4,7 @@ const Classroom = require('../models/classroomModel');
 const LineUser = require('../models/lineUserModel');
 
 const client = new line.Client({
-  channelAccessToken: process.env.LINE_CHANNEL_ACCESS_TOKEN,
+  channelAccessToken: `0S82MK8Q8Db9CqR4lh26Tr9qoU16U5p4RS0xfIXBEGne7zHYpq7plHgEMCW8TCgss85IrcWwrRdfP5q0VoMHFrOB1850fGdkiw9y0rX61cblBm5KfC/0FDr7yazl+SY7wo4eOcNlF4E74WjZIumo0wdB04t89/1O/w1cDnyilFU=`,
 });
 
 const handleConnectClassroom = async (event, accessCode) => {
