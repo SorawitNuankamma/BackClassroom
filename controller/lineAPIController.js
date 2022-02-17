@@ -10,32 +10,77 @@ const client = new line.Client({
 const handleConnectClassroom = async (event, accessCode) => {
   const classroom = await Classroom.findOne({ accessCode: accessCode });
   if (!classroom) {
-    return `ไม่พบห้องเรียนที่มีรหัสนั้น โปรดลองใหม่ในภายหลัง หากรอแล้วยังเกิดปัญหาอยู่ โปรดติดต่อฝ่ายสนับสนุนผลิตภัณท์`;
+    return {
+      type: 'text',
+      text: `ไม่พบห้องเรียนที่มีรหัสนั้น โปรดลองใหม่ในภายหลัง หากรอแล้วยังเกิดปัญหาอยู่ โปรดติดต่อฝ่ายสนับสนุนผลิตภัณท์`,
+    };
   }
   // find owner lineUserId with the classroom owner id
   const lineUser = await LineUser.findById(classroom.users[0].userId);
   if (!lineUser) {
-    return `ข้อผิดพลาด: สมาชิกไม่ได้เป็นสมาชิกห้องเรียนนั้นๆ`;
+    return {
+      type: 'text',
+      text: `ข้อผิดพลาด: สมาชิกไม่ได้เป็นสมาชิกห้องเรียนนั้นๆ`,
+    };
   }
   // check if user is owner
   if (event.source.userId !== lineUser.lineUserId) {
-    return `ข้อผิดพลาด: สมาชิกไม่ได้เป็นเจ้าของห้องเรียน`;
+    return {
+      type: 'text',
+      text: `ข้อผิดพลาด: สมาชิกไม่ได้เป็นเจ้าของห้องเรียน`,
+    };
   }
 
   // check if classroom already connected
-  if (classroom.lineGroupChatId) {
-    return `ข้อผิดพลาด: ห้องเรียนนี้ถูกเชื่อมต่อกับกลุ่มสนทนาอื่นเรียบร้อยแล้ว`;
+  if (classroom.lineGroupChatId || classroom.lineGroupChatId === '') {
+    return {
+      type: 'text',
+      text: `ข้อผิดพลาด: ห้องเรียนนี้ถูกเชื่อมต่อกับกลุ่มสนทนาเรียบร้อยแล้ว`,
+    };
   }
   // save groupchatId to classroom
   classroom.lineGroupChatId = event.source.groupId;
   classroom.save();
-  return `เชื่อมต่อกับห้องเรียน ${classroom.name} สำเร็จ`;
+  return {
+    type: 'text',
+    text: `เชื่อมต่อกับห้องเรียน ${classroom.name} สำเร็จ`,
+  };
 };
 
 const commandBlock = {
   connect: handleConnectClassroom,
   test: () => {
-    return 'ทดสอบ 123';
+    return {
+      type: 'text',
+      text: 'ทดสอบ 123',
+    };
+  },
+  testButton: () => {
+    return {
+      type: 'template',
+      altText: 'This is a buttons template',
+      template: {
+        type: 'buttons',
+        thumbnailImageUrl: 'https://example.com/bot/images/image.jpg',
+        imageAspectRatio: 'rectangle',
+        imageSize: 'cover',
+        imageBackgroundColor: '#FFFFFF',
+        title: 'Menu',
+        text: '  ',
+        defaultAction: {
+          type: 'uri',
+          label: 'View detail',
+          uri: 'http://example.com/page/123',
+        },
+        actions: [
+          {
+            type: 'uri',
+            label: 'ดูเนื้อหา',
+            uri: 'http://example.com/page/123',
+          },
+        ],
+      },
+    };
   },
 };
 
@@ -49,9 +94,9 @@ exports.postLineMessage = catchAsync(async (req, res, next) => {
   const events = req.body.events;
 
   const promises = events.map(async (event) => {
-    const message = {
+    let message = {
       type: 'text',
-      text: '',
+      text: 'dd',
     };
     let userMessage = event.message.text.trim();
     if (event.type === 'join') {
@@ -62,10 +107,18 @@ exports.postLineMessage = catchAsync(async (req, res, next) => {
       // bot command
       let command = userMessage.slice(1, userMessage.length).split(' ');
       // mapping command to each case
-      message.text = commandBlock[command[0]](event, command[1]);
+      try {
+        message = await commandBlock[command[0]](event, command[1]);
+      } catch (e) {
+        console.log(e);
+      }
     }
     if (message.text !== '') {
-      await client.replyMessage(`${event.replyToken}`, message);
+      try {
+        await client.replyMessage(`${event.replyToken}`, message);
+      } catch (e) {
+        console.log(e);
+      }
     }
   });
 

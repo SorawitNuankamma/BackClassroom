@@ -21,6 +21,7 @@ const lineUserRouter = require('./routes/lineUserRoutes');
 const fileRouter = require('./routes/fileRoutes');
 const submissionRouter = require('./routes/submissionRoutes');
 const lineAPIRouter = require('./routes/lineAPIRoutes');
+const schedulerRouter = require('./routes/schedulerRoutes');
 
 const app = express();
 
@@ -79,6 +80,7 @@ app.use('/api/lineUsers', lineUserRouter);
 app.use('/api/files', fileRouter);
 app.use('/api/submissions', submissionRouter);
 app.use('/api/lineAPI', lineAPIRouter);
+app.use('/api/schedulers', schedulerRouter);
 
 // Unhandled route
 app.all('*', (req, res, next) => {

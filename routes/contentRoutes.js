@@ -25,7 +25,7 @@ router.patch(
 router
   .route('/')
   .get(contentController.getAllContents)
-  .post(authController.loginOnly, contentController.postContent);
+  .post(contentController.postContent);
 
 router
   .route('/:id')

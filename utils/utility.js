@@ -10,3 +10,9 @@ exports.filterObject = (obj, ...allowedFields) => {
   });
   return newObj;
 };
+
+exports.callback = {
+  notify: (message) => {
+    console.log(message);
+  },
+};

@@ -16,50 +16,11 @@ exports.formatPostRequest = catchAsync(async (req, res, next) => {
     color: req.body.color,
     users: [],
     rules: req.body.rules,
+    meetingLink: req.body.meetingLink,
     grader: [],
     calender: [],
-    timetable: {
-      mon: [],
-      tue: [],
-      wed: [],
-      thu: [],
-      fri: [],
-      sat: [],
-      sun: [],
-    },
+    timetable: req.body.timetable,
   };
-
-  // fill grader
-  // fill timetable
-  req.body.timetable.forEach((el) => {
-    let day = el[0];
-    switch (day) {
-      case 'Monday':
-        classroomObject.timetable.mon.push(el[1]);
-        break;
-      case 'Tuesday':
-        classroomObject.timetable.tue.push(el[1]);
-        break;
-      case 'Wednesday':
-        classroomObject.timetable.wed.push(el[1]);
-        break;
-      case 'Thursday':
-        classroomObject.timetable.thu.push(el[1]);
-        break;
-      case 'Friday':
-        classroomObject.timetable.fri.push(el[1]);
-        break;
-      case 'Saturday':
-        classroomObject.timetable.sat.push(el[1]);
-        break;
-      case 'Sunday':
-        classroomObject.timetable.sun.push(el[1]);
-        break;
-      default:
-        break;
-    }
-  });
-
   classroomObject.users.push({
     userId: req.user.id,
     name: req.user.name,

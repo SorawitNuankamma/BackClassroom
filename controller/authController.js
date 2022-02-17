@@ -8,6 +8,34 @@ const sendEmail = require('../utils/email');
 const crypto = require('crypto');
 const { promisify } = require('util');
 
+const getLineToken = async (code) => {
+  const response = await fetch('https://api.line.me/oauth2/v2.1/token', {
+    method: 'POST',
+    mode: 'cors',
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code,
+      redirect_uri: `${
+        process.env.NODE_ENV === 'development'
+          ? process.env.LINE_CHANNEL_CALLBACK_DEV
+          : process.env.LINE_CHANNEL_CALLBACK_PROD
+      }`,
+      client_id: `${
+        process.env.NODE_ENV === 'development'
+          ? process.env.LINE_CHANNEL_ID_DEV
+          : process.env.LINE_CHANNEL_ID_PROD
+      }`,
+      client_secret: `${
+        process.env.NODE_ENV === 'development'
+          ? process.env.LINE_CHANNEL_SECRET_DEV
+          : process.env.LINE_CHANNEL_SECRET_PROD
+      }`,
+      code_verifier: 'wJKN8qz5t8SSI9lMFhZA6qwNkQBkuPZoCxzRhwLRUo1',
+    }),
+  });
+  return response.json(); // parses JSON response into native JavaScript objects
+};
+
 const verifyLineToken = async (token) => {
   const response = await fetch(
     `https://api.line.me/oauth2/v2.1/verify?access_token=${token}`,
@@ -45,7 +73,7 @@ const createSendToken = (user, statusCode, res) => {
     httpOnly: true,
   };
 
-  if ((process.env.NODE_ENV = 'production')) {
+  if (process.env.NODE_ENV === 'production') {
     cookieOptions.secure = true;
   }
   res.cookie('jwt', token, cookieOptions);
@@ -340,6 +368,51 @@ exports.lineSignUp = catchAsync(async (req, res, next) => {
         });
     });
   });
+});
+
+exports.lineAuthen = catchAsync(async (req, res, next) => {
+  // get user token from code
+  if (!req.body.code) {
+    console.log('You are not provide an accessCode!');
+    return next(new AppError('You are not provide an accessCode!', 401));
+  }
+
+  let lineResponse = await getLineToken(req.body.code);
+
+  if (!lineResponse.access_token) {
+    console.log(lineResponse);
+    return next(new AppError('Invalid code', 401));
+  }
+
+  // verification the token
+  let verifyResponse = await verifyLineToken(lineResponse.access_token);
+
+  if (
+    !verifyResponse.client_id ===
+    (process.env.NODE_ENV === 'development'
+      ? process.env.LINE_CHANNEL_ID_DEV
+      : process.env.LINE_CHANNEL_ID_PROD)
+  ) {
+    return next(new AppError('verification process invalid', 500));
+  }
+
+  //get user info from line
+  let profile = await getLineUserProfile(lineResponse.access_token);
+
+  // get user info from database
+  let lineUser = await LineUser.findOne({ lineUserId: profile.userId });
+
+  //if no user sign user up instead
+  if (!lineUser) {
+    let newLineUser = await LineUser.create({
+      name: profile.displayName,
+      lineUserId: profile.userId,
+      pictureURL: profile.pictureUrl,
+    });
+    createSendToken(newLineUser, 200, res);
+  }
+
+  createSendToken(lineUser, 200, res);
 });
 
 //Middleware function for protect route
