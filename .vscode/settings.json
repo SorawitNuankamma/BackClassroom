@@ -1,4 +1,4 @@
 {
-    "appService.defaultWebAppToDeploy": "/subscriptions/db5f3d64-8015-42dc-864a-8cb1ca02af27/resourceGroups/Classroom/providers/Microsoft.Web/sites/SmartClassroomService",
-    "appService.deploySubpath": "."
+    "appService.deploySubpath": ".",
+    "appService.defaultWebAppToDeploy": "/subscriptions/db5f3d64-8015-42dc-864a-8cb1ca02af27/resourceGroups/Classroom/providers/Microsoft.Web/sites/SmartClassroomService"
 }

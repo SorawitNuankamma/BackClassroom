@@ -96,7 +96,7 @@ classroomSchema.pre('save', async function (next) {
 
 // Cascade Save
 classroomSchema.post('save', async function (doc) {
-  if (!this.isNew) return next();
+  if (!this.isNew) return;
 
   const user = await LineUser.findById(doc.users[0].userId);
   user.classrooms.push({
