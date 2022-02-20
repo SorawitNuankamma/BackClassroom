@@ -52,30 +52,34 @@ const contentSchema = new mongoose.Schema(
 contentSchema.pre('save', async function (next) {
   this.createDate = Date();
 
+  next();
+});
+
+contentSchema.post('save', async function (doc) {
   // send message to line group
-  let classroom = await Classroom.findById(this.classId);
+  let classroom = await Classroom.findById(doc.classId);
   if (classroom.lineGroupChatId || classroom.lineGroupChatId !== '') {
     let message = {
       type: 'template',
       altText: 'This is a buttons template',
       template: {
         type: 'buttons',
-        thumbnailImageUrl: thumbnailImageOf[this.type],
+        thumbnailImageUrl: thumbnailImageOf[doc.type],
         imageAspectRatio: 'rectangle',
         imageSize: 'cover',
         imageBackgroundColor: '#FFFFFF',
-        title: `${titleOf[this.type]}`,
-        text: `${this.title}`,
+        title: `${titleOf[doc.type]}`,
+        text: `${doc.title}`,
         defaultAction: {
           type: 'uri',
           label: 'View detail',
-          uri: 'http://example.com/page/123',
+          uri: `https://liff.line.me/1656907747-ZYdAAnyB/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
         },
         actions: [
           {
             type: 'uri',
             label: 'ดูเนื้อหา',
-            uri: 'http://example.com/page/123',
+            uri: `https://liff.line.me/1656907747-ZYdAAnyB/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
           },
         ],
       },
@@ -86,8 +90,6 @@ contentSchema.pre('save', async function (next) {
       console.log(e);
     }
   }
-
-  next();
 });
 
 const Content = mongoose.model('Content', contentSchema);
