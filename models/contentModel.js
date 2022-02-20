@@ -73,17 +73,18 @@ contentSchema.post('save', async function (doc) {
         defaultAction: {
           type: 'uri',
           label: 'View detail',
-          uri: `https://liff.line.me/1656907747-ZYdAAnyB/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
+          uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
         },
         actions: [
           {
             type: 'uri',
             label: 'ดูเนื้อหา',
-            uri: `https://liff.line.me/1656907747-ZYdAAnyB/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
+            uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=app/my-classroom/${doc.classId}/classroom-lesson/${doc.id}`,
           },
         ],
       },
     };
+    console.log(message);
     try {
       await client.pushMessage(classroom.lineGroupChatId, message);
     } catch (e) {
