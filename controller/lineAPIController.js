@@ -39,6 +39,7 @@ const handleConnectClassroom = async (event, accessCode) => {
     };
   }
   // save groupchatId to classroom
+  let code = classroom.accessCode;
   classroom.lineGroupChatId = event.source.groupId;
   classroom.save();
   return [
@@ -61,13 +62,13 @@ const handleConnectClassroom = async (event, accessCode) => {
         defaultAction: {
           type: 'uri',
           label: 'View detail',
-          uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=12345`,
+          uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=${code}`,
         },
         actions: [
           {
             type: 'uri',
             label: 'ดูเนื้อหา',
-            uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=12345`,
+            uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=${code}`,
           },
         ],
       },
