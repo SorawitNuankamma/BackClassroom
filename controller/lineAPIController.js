@@ -125,7 +125,7 @@ exports.postLineMessage = catchAsync(async (req, res, next) => {
   const promises = events.map(async (event) => {
     let message = {
       type: 'text',
-      text: 'dd',
+      text: '',
     };
     let userMessage = event.message.text.trim();
     if (event.type === 'join') {
