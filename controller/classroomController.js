@@ -185,6 +185,7 @@ exports.joinClassroom = catchAsync(async (req, res, next) => {
     userId: req.user.id,
     name: req.user.name,
     classroomRole: 'Student',
+    lineUserId: req.user.lineUserId,
   };
 
   classroom.users.push(classroomNewUser);

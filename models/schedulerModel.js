@@ -1,12 +1,7 @@
 const mongoose = require('mongoose');
 const schedule = require('node-schedule');
 const validator = require('validator');
-
-const callback = {
-  notify: (message) => {
-    console.log(message);
-  },
-};
+const utility = require('../utils/utility');
 
 const schedulerSchema = new mongoose.Schema(
   {
@@ -26,6 +21,12 @@ const schedulerSchema = new mongoose.Schema(
       default: 'notify',
     },
     message: String,
+    messageType: {
+      type: String,
+      enum: ['text', 'sticker', 'template'],
+      default: 'text',
+    },
+    target: String,
     owner: mongoose.Schema.Types.ObjectId,
     createDate: Date,
     isDisabled: {
@@ -46,9 +47,10 @@ schedulerSchema.pre('save', function (next) {
   let event = this.event;
   let name = this.name;
   let message = this.message;
+  let target = this.target;
 
-  schedule.scheduleJob(`${name}`, this.scheduleAt, function () {
-    callback[event](message);
+  schedule.scheduleJob(`${name}`, this.scheduleAt, async function () {
+    await utility.callback[event](message, target);
   });
   // if isDisabled are true then cancel it
   next();

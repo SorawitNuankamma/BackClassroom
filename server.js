@@ -2,12 +2,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Scheduler = require('./models/schedulerModel');
 const schedule = require('node-schedule');
-
-const callback = {
-  notify: (message) => {
-    console.log(message);
-  },
-};
+const utility = require('./utils/utility');
 
 process.on('uncaughtException', (err) => {
   console.log('UNCAUGHT REJECTION !!! SHUTTING DOWN');
@@ -52,14 +47,14 @@ process.on('unhandledRejection', (err) => {
 
 // Better implement this by cancel this job instead
 // but this project wont scale. so there is no reason to use it
-Scheduler.find().then((schedulers) => {
+Scheduler.find().then(async (schedulers) => {
   schedulers.forEach((scheduler) => {
     schedule.scheduleJob(scheduler.scheduleAt, async function () {
       // fetching current scheduler state
       let currentScheduler = await Scheduler.findById(scheduler.id);
       // if it not disable then run it
       if (!currentScheduler.isDisabled) {
-        callback[scheduler.event](scheduler.message);
+        await utility.callback[scheduler.event](scheduler.message);
       }
     });
   });

@@ -41,10 +41,38 @@ const handleConnectClassroom = async (event, accessCode) => {
   // save groupchatId to classroom
   classroom.lineGroupChatId = event.source.groupId;
   classroom.save();
-  return {
-    type: 'text',
-    text: `เชื่อมต่อกับห้องเรียน ${classroom.name} สำเร็จ`,
-  };
+  return [
+    {
+      type: 'text',
+      text: `เชื่อมต่อกับห้องเรียน ${classroom.name} สำเร็จ`,
+    },
+    {
+      type: 'template',
+      altText: `เข้าร่วมห้องเรียน`,
+      template: {
+        type: 'buttons',
+        thumbnailImageUrl:
+          'https://cdn.filestackcontent.com/r7txgd1rTAy66EcL5Ft7',
+        imageAspectRatio: 'rectangle',
+        imageSize: 'cover',
+        imageBackgroundColor: '#FFFFFF',
+        title: `เข้าร่วมห้องเรียนใหม่`,
+        text: `สามารถเข้าร่วมห้องเรียนได้ผ่านช่องทางนี้`,
+        defaultAction: {
+          type: 'uri',
+          label: 'View detail',
+          uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=12345`,
+        },
+        actions: [
+          {
+            type: 'uri',
+            label: 'ดูเนื้อหา',
+            uri: `https://liff.line.me/1656696595-3dzBR2wb/authentication?loginTo=/app/join-classroom?code=12345`,
+          },
+        ],
+      },
+    },
+  ];
 };
 
 const commandBlock = {

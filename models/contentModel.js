@@ -61,7 +61,7 @@ contentSchema.post('save', async function (doc) {
   if (classroom.lineGroupChatId || classroom.lineGroupChatId !== '') {
     let message = {
       type: 'template',
-      altText: 'This is a buttons template',
+      altText: `${titleOf[doc.type]}`,
       template: {
         type: 'buttons',
         thumbnailImageUrl: thumbnailImageOf[doc.type],

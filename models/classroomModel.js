@@ -77,6 +77,10 @@ const classroomSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    isJustCreate: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -91,40 +95,48 @@ classroomSchema.pre('save', async function (next) {
   // Generate Room Code
   this.accessCode = crypto.randomBytes(3).toString('hex');
 
+  // Add user to be owner in this classroom
+  const user = await LineUser.findById(this.users[0].userId);
+  user.classrooms.push({
+    classroomName: this.name,
+    classroomColor: this.color,
+    classroomRole: this.users[0].classroomRole,
+  });
+  await user.save();
+
   next();
 });
 
 // Cascade Save
 classroomSchema.post('save', async function (doc) {
-  if (!this.isNew) return;
+  if (doc.lineGroupChatId) {
+    // remove scheduler related to this classroom
+    const oldSchedulers = await Scheduler.find({ owner: doc.id });
+    const deletePromises = oldSchedulers.map(async (scheduler, index) => {
+      await Scheduler.findByIdAndDelete(scheduler.id);
+    });
+    await Promise.all(deletePromises);
 
-  const user = await LineUser.findById(doc.users[0].userId);
-  user.classrooms.push({
-    classroomId: doc.id,
-    classroomName: doc.name,
-    classroomColor: doc.color,
-    classroomRole: doc.users[0].classroomRole,
-  });
+    // Create Schedule for each time in class
+    const promises = this.timetable.map(async (time, index) => {
+      let newScheduler = {
+        name: `${doc.id}:classnotify:${index}`,
+        scheduleAt: `${trimZero(time[1].start.split(':')[1])} ${trimZero(
+          time[1].start.split(':')[0]
+        )} * * ${timeValue[time[0]]}`,
+        event: 'notify',
+        isDisabled: false,
+        message: `${doc.meetingLink}`,
+        messageType: 'template',
+        target: doc.lineGroupChatId,
+        owner: doc.id,
+      };
+      console.log(newScheduler);
 
-  // Create Schedule for each time in class
-  const promises = this.timetable.map(async (time, index) => {
-    let newScheduler = {
-      name: `${doc.id}:classnotify:${index}`,
-      scheduleAt: `${trimZero(time[1].start.split(':')[1])} ${trimZero(
-        time[1].start.split(':')[0]
-      )} * * ${timeValue[time[0]]}`,
-      event: 'notify',
-      isDisabled: true,
-      message: `ขณะนี้ห้องเรียนได้เริ่มต้นขึ้นแล้ว สามารถเข้าร่วมได้ที่นี้ => ${doc.meetingLink}`,
-      owner: doc.id,
-    };
-
-    await Scheduler.create(newScheduler);
-  });
-
-  await Promise.all(promises);
-
-  await user.save();
+      await Scheduler.create(newScheduler);
+    });
+    await Promise.all(promises);
+  }
 });
 
 // Cascade Delete
