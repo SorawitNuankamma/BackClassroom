@@ -41,6 +41,10 @@ const contentSchema = new mongoose.Schema(
     createDate: String,
     lastChangeDate: String,
     dueDate: String,
+    fullScore: {
+      type: Number,
+      default: 100,
+    },
   },
   {
     toJSON: { virtuals: true },

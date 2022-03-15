@@ -31,7 +31,7 @@ const classroomSchema = new mongoose.Schema(
       type: String,
       default: 'default_classname_name',
       maxlength: [50, 'a name should not be longer than 30 character'],
-      minlength: [5, 'a name must be longer than 3 character'],
+      minlength: [3, 'a name must be longer than 3 character'],
       validator: [validator.isAlpha, 'must only contain character'],
     },
     description: {
@@ -101,6 +101,9 @@ classroomSchema.pre('save', async function (next) {
     classroomName: this.name,
     classroomColor: this.color,
     classroomRole: this.users[0].classroomRole,
+    lineUserId: this.users.lineUserId,
+    studentCode: '999',
+    email: 'none',
   });
   await user.save();
 

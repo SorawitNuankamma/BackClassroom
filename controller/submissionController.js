@@ -147,7 +147,16 @@ exports.getAllSubmissionsAndFile = catchAsync(async (req, res, next) => {
   }
 
   // get submission
-  const submissions = await Submission.find({ contentId: req.query.contentId });
+  const submissions = await Submission.find({
+    contentId: req.query.contentId,
+    isStudent: req.query.isStudent ? req.query.isStudent : true,
+  });
+
+  if (submissions.length === 0) {
+    res.status(400).json({
+      status: 'fail',
+    });
+  }
 
   // get classroom
   // all submission are in the same classroom
@@ -164,6 +173,7 @@ exports.getAllSubmissionsAndFile = catchAsync(async (req, res, next) => {
     const tempObject = {
       member: {},
       id: el.id,
+      isSubmitted: el.isSubmitted,
       comment: el.comment,
       score: el.score,
       isGraded: el.isGraded,

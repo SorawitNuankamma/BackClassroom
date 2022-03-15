@@ -157,3 +157,22 @@ exports.postLineMessage = catchAsync(async (req, res, next) => {
     status: 'success',
   });
 });
+
+exports.sendLineMessage = catchAsync(async (req, res, next) => {
+  if (!req.body) {
+    res.status(400).json({
+      status: 'fail',
+    });
+  }
+  let message = {
+    type: 'text',
+    text: `${req.body.text}`,
+  };
+
+  console.log(req.body);
+  await client.pushMessage(req.body.targetId, message);
+
+  res.status(200).json({
+    status: 'success',
+  });
+});

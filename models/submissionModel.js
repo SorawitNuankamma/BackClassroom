@@ -18,6 +18,10 @@ const submissionSchema = new mongoose.Schema(
     contentId: String,
     classroomId: String,
     submitDate: String,
+    isSubmitted: {
+      type: Boolean,
+      default: false,
+    },
     isStudent: Boolean,
     isGraded: {
       type: Boolean,

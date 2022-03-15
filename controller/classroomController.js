@@ -22,6 +22,7 @@ exports.formatPostRequest = catchAsync(async (req, res, next) => {
     timetable: req.body.timetable,
   };
   classroomObject.users.push({
+    id: 1,
     userId: req.user.id,
     name: req.user.name,
     classroomRole: 'Owner',
@@ -182,10 +183,13 @@ exports.joinClassroom = catchAsync(async (req, res, next) => {
 
   // Add user to classroom
   const classroomNewUser = {
+    id: classroom.users[classroom.users.length - 1].id + 1,
     userId: req.user.id,
-    name: req.user.name,
+    name: req.body.name,
     classroomRole: 'Student',
     lineUserId: req.user.lineUserId,
+    studentCode: req.body.studentCode,
+    email: req.body.email,
   };
 
   classroom.users.push(classroomNewUser);
