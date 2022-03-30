@@ -335,6 +335,7 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
   };
 
   const memberSubmissions = members.map((member) => {
+    console.log(member);
     const row = {
       column0: {
         value: member.name,
@@ -342,7 +343,7 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
       },
     };
     row[`column1`] = {
-      value: member.code,
+      value: member.studentCode,
       type: 'number',
     };
 

@@ -24,7 +24,7 @@ const contentSchema = new mongoose.Schema(
     title: {
       type: String,
       default: 'default_content_name',
-      maxlength: [20, 'a name should not be longer than 10 character'],
+      maxlength: [50, 'a name should not be longer than 50 character'],
       minlength: [3, 'a name must be longer than 3 character'],
       validator: [validator.isAlpha, 'must only contain character'],
     },

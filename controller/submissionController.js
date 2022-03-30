@@ -156,6 +156,7 @@ exports.getAllSubmissionsAndFile = catchAsync(async (req, res, next) => {
     res.status(400).json({
       status: 'fail',
     });
+    return;
   }
 
   // get classroom
