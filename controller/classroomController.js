@@ -316,10 +316,12 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
     sortInvert: true,
   };
 
+  let fullSumScore = 0;
   // Mid Column
   assignments.forEach((assignment, index) => {
+    fullSumScore += assignment.fullScore;
     column[`column${index + 2}`] = {
-      name: assignment.title,
+      name: `${assignment.title} (${assignment.fullScore})`,
       type: 'editField',
       sortAble: true,
       sortInvert: false,
@@ -328,7 +330,7 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
 
   //Aggregrate Column
   column['sum'] = {
-    name: 'คะแนนรวม',
+    name: `คะแนนรวม (${fullSumScore})`,
     type: 'number',
     sortAble: true,
     sortInvert: true,
