@@ -274,6 +274,7 @@ exports.getMemberInfo = catchAsync(async (req, res, next) => {
 
 // Classroom route
 exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
+  console.log(req.query);
   if (!req.query.classroomId) {
     return next(new AppError('Invalid request', 400));
   }
@@ -291,11 +292,13 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
   });
 
   // get submissions that belong in this classroom
-  const submissions = await Submission.find({
-    classroomId: req.query.classroomId,
-  }).sort('contentId');
+  let submissionQueryObject = { classroomId: req.query.classroomId };
 
-  const members = classroom.users.filter(
+  const submissions = await Submission.find(submissionQueryObject).sort(
+    'contentId'
+  );
+
+  let members = classroom.users.filter(
     (member) => member.classroomRole === 'Student'
   );
 
@@ -336,11 +339,11 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
     sortInvert: true,
   };
 
-  const memberSubmissions = members.map((member) => {
-    console.log(member);
+  let memberSubmissions = members.map((member) => {
     const row = {
       column0: {
         value: member.name,
+        userId: member.userId,
         path: `../classroom-members/${member.userId}`,
       },
     };
@@ -384,11 +387,55 @@ exports.getAllMembersAndSubmissions = catchAsync(async (req, res, next) => {
     return row;
   });
 
+  //statistics
+  let membersStat = JSON.parse(JSON.stringify(memberSubmissions));
+  membersStat.sort(function compare(a, b) {
+    if (a.sum < b.sum) {
+      return -1;
+    }
+    if (a.sum > b.sum) {
+      return 1;
+    }
+    return 0;
+  });
+  let sumAllScore = 0;
+  membersStat.forEach((member, index) => {
+    membersStat[index]['rank'] = index + 1;
+    sumAllScore += member.sum.value;
+  });
+  console.log(membersStat);
+  let mean = sumAllScore / membersStat.length;
+  let preVariance = 0;
+  membersStat.forEach((member, index) => {
+    preVariance = Math.pow(member.sum.value - mean, 2);
+  });
+  let variance = preVariance / membersStat.length - 1;
+  let std = Math.sqrt(variance);
+  let max = membersStat[0].sum.value;
+  let min = membersStat[membersStat.length - 1].sum.value;
+  let classroomStat = {
+    mean,
+    min,
+    max,
+    std,
+  };
+
+  console.log(req.query.studentId);
+  console.log(memberSubmissions);
+  //filter
+  if (req.query.studentId !== 'null') {
+    memberSubmissions = memberSubmissions.filter(
+      (member) => member.column0.userId === req.query.studentId
+    );
+  }
+
   res.status(200).json({
     status: 'success',
     data: {
       column,
       memberSubmissions,
+      membersStat,
+      classroomStat,
     },
   });
 });
