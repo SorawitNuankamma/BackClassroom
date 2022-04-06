@@ -25,6 +25,8 @@ exports.formatPostRequest = catchAsync(async (req, res, next) => {
     id: 1,
     userId: req.user.id,
     name: req.user.name,
+    email: req.body.userEmail,
+    studentCode: 0,
     classroomRole: 'Owner',
   });
   req.body = classroomObject;
